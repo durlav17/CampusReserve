@@ -158,6 +158,15 @@ describe('API integration (Oracle)', { skip: !RUN && 'set RUN_DB_TESTS=1 to run 
     assert.ok(res.body.booking.history.length >= 1);
   });
 
+  // UID is reserved in Oracle SQL: a :uid bind in these queries fails with ORA-01745.
+  test('a user can list their own bookings, tickets and notifications', async () => {
+    for (const path of ['/api/bookings', '/api/maintenance', '/api/notifications']) {
+      const res = await request(app).get(path).set(auth('student'));
+      assert.equal(res.status, 200, path);
+      assert.ok(Array.isArray(res.body.items), path);
+    }
+  });
+
   test('TC-16 analytics endpoints answer from the database', async () => {
     const s = await request(app).get('/api/analytics/summary').set(auth('admin'));
     assert.equal(s.status, 200);

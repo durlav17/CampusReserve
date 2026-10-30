@@ -40,7 +40,7 @@ Create the empty repository on github.com first (no README, no .gitignore — th
    Then connect as `campus` (SQL Developer or SQLcl with the same descriptor) and run `database/run_all.sql`.
 5. **Wallet alternative.** If you keep mTLS required: download the *Instance wallet*, unzip it on the API host, and set `DB_WALLET_DIR` (folder containing `tnsnames.ora` and `ewallet.pem`), `DB_WALLET_PASSWORD`, and `DB_CONNECT_STRING=<alias>_low`. On Render this requires a *Secret File* or a disk; the walletless option is simpler.
 
-**Local alternative (no cloud):** Oracle Database Free in Docker (`EVIDENCE_CAPTURE_GUIDE.md` §0) with `DB_CONNECT_STRING=localhost:1521/FREEPDB1`. The database technology is unchanged.
+**Local alternative (no cloud):** Oracle Database Free in Docker (`EVIDENCE_CAPTURE_GUIDE.md` §0) with `DB_CONNECT_STRING=localhost:1521/FREEPDB1`, or Oracle XE 21c with `localhost:1521/XEPDB1`. The database technology is unchanged. A database on your own machine is for local development only: Render cannot reach it, and the API refuses to start in production with a localhost connection string.
 
 ## 3. Deploy the API on Render
 

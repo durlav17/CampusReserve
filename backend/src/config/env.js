@@ -1,6 +1,15 @@
 // Centralised, validated configuration. The process refuses to start with an
 // unsafe production configuration instead of failing later at request time.
+import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
+
+// Node does not read .env by itself. Load backend/.env when it exists; variables
+// already set in the environment (Render, CI, the shell) always take precedence.
+try {
+  process.loadEnvFile(fileURLToPath(new URL('../../.env', import.meta.url)));
+} catch (err) {
+  if (err.code !== 'ENOENT') throw err;
+}
 
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -8,11 +17,11 @@ const schema = z.object({
   TZ: z.string().default('Asia/Kolkata'),
 
   // Oracle connection. DB_CONNECT_STRING accepts an Easy Connect string
-  // (localhost:1521/FREEPDB1), a TNS alias, or a full descriptor for
+  // (localhost:1521/XEPDB1), a TNS alias, or a full descriptor for
   // Autonomous Database (walletless TLS).
   DB_USER: z.string().min(1).default('campus'),
   DB_PASSWORD: z.string().default(''),
-  DB_CONNECT_STRING: z.string().min(1).default('localhost:1521/FREEPDB1'),
+  DB_CONNECT_STRING: z.string().min(1).default('localhost:1521/XEPDB1'),
   DB_WALLET_DIR: z.string().optional(),          // only for mTLS wallets
   DB_WALLET_PASSWORD: z.string().optional(),
   DB_POOL_MIN: z.coerce.number().int().min(0).default(1),
@@ -49,6 +58,18 @@ if (!env.JWT_SECRET) {
 if (env.isProduction && env.JWT_SECRET.length < 32) {
   console.error('JWT_SECRET is too short; use at least 32 random characters.');
   process.exit(1);
+}
+
+if (env.isProduction) {
+  if (!env.DB_PASSWORD) {
+    console.error('DB_PASSWORD must be set in production.');
+    process.exit(1);
+  }
+  // A cloud host cannot reach a database on a developer's machine.
+  if (/localhost|127\.0\.0\.1|\[?::1\]?/i.test(env.DB_CONNECT_STRING)) {
+    console.error('DB_CONNECT_STRING must point at a reachable Oracle database in production, not localhost.');
+    process.exit(1);
+  }
 }
 
 process.env.TZ = env.TZ;

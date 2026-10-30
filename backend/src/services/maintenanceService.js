@@ -4,7 +4,7 @@ export function listMaintenance(user, { status, priority, resourceId, mine, limi
   return withConnection(user.userId, async (conn) => {
     const where = ['1 = 1'];
     const binds = { limit, offset };
-    if (mine) { where.push('reporter_id = :uid'); binds.uid = user.userId; }
+    if (mine) { where.push('reporter_id = :userId'); binds.userId = user.userId; }
     if (status) { where.push('status = :status'); binds.status = status; }
     if (priority) { where.push('priority = :priority'); binds.priority = priority; }
     if (resourceId) { where.push('resource_id = :rid'); binds.rid = resourceId; }

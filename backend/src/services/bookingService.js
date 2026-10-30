@@ -50,7 +50,7 @@ export function listBookings(user, { scope, status, from, to, resourceId, limit,
   return withConnection(user.userId, async (conn) => {
     const where = ['1 = 1'];
     const binds = { limit, offset };
-    if (scope !== 'all') { where.push('requester_id = :uid'); binds.uid = user.userId; }
+    if (scope !== 'all') { where.push('requester_id = :userId'); binds.userId = user.userId; }
     if (status) { where.push('status = :status'); binds.status = status; }
     if (resourceId) { where.push('resource_id = :rid'); binds.rid = resourceId; }
     if (from) { where.push('end_time > :fromTs'); binds.fromTs = { type: TS, val: from }; }

@@ -21,12 +21,12 @@ export function listAudit(uid, { table, recordId, action, limit, offset }) {
 
 export const listNotifications = (uid) => withConnection(uid, (c) =>
   query(c, `SELECT notification_id, notif_type, title, message, booking_id, is_read, created_at
-              FROM notifications WHERE user_id = :uid
-             ORDER BY created_at DESC FETCH FIRST 50 ROWS ONLY`, { uid }));
+              FROM notifications WHERE user_id = :userId
+             ORDER BY created_at DESC FETCH FIRST 50 ROWS ONLY`, { userId: uid }));
 
 export const markRead = (uid, id) => withTransaction(uid, (c) =>
-  c.execute(`UPDATE notifications SET is_read = 'Y' WHERE notification_id = :id AND user_id = :uid`,
-    { id, uid }));
+  c.execute(`UPDATE notifications SET is_read = 'Y' WHERE notification_id = :id AND user_id = :userId`,
+    { id, userId: uid }));
 
 export const markAllRead = (uid) => withTransaction(uid, (c) =>
-  c.execute(`UPDATE notifications SET is_read = 'Y' WHERE user_id = :uid AND is_read = 'N'`, { uid }));
+  c.execute(`UPDATE notifications SET is_read = 'Y' WHERE user_id = :userId AND is_read = 'N'`, { userId: uid }));

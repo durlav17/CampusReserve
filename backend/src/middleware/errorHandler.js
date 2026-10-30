@@ -12,7 +12,7 @@ export function errorHandler(err, req, res, _next) {
   if (!httpErr && err?.type === 'entity.parse.failed') {
     httpErr = new HttpError(400, 'INVALID_JSON', 'Request body is not valid JSON.');
   }
-  if (!httpErr && (err?.status === 503 || err?.code === 'NJS-500' || err?.code === 'NJS-503' || /^(ORA-125|ORA-12541|NJS-5)/.test(err?.message || ''))) {
+  if (!httpErr && (err?.status === 503 || err?.code === 'NJS-500' || err?.code === 'NJS-503' || /^(ORA-125|ORA-01017|ORA-28000|ORA-28001|NJS-040|NJS-5)/.test(err?.message || ''))) {
     httpErr = new HttpError(503, 'DATABASE_UNAVAILABLE', 'The database is temporarily unavailable.');
   }
   if (!httpErr) {
