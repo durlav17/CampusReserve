@@ -1,0 +1,30 @@
+# Render Blueprint for the CampusReserve API (https://render.com/docs/yaml-spec)
+services:
+  - type: web
+    name: campusreserve-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    plan: free
+    region: singapore
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TZ
+        value: Asia/Kolkata
+      - key: NODE_VERSION
+        value: "22"
+      - key: DB_USER
+        value: campus
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_CONNECT_STRING
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 8h

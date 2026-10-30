@@ -1,0 +1,31 @@
+flowchart LR
+    ROLES["ROLES<br/><b>role_id</b> PK"]
+    DEPARTMENTS["DEPARTMENTS<br/><b>dept_id</b> PK"]
+    BUILDINGS["BUILDINGS<br/><b>building_id</b> PK"]
+    CATS["RESOURCE_CATEGORIES<br/><b>category_id</b> PK"]
+    USERS["USERS<br/><b>user_id</b> PK<br/>role_id FK, dept_id FK"]
+    RESOURCES["RESOURCES<br/><b>resource_id</b> PK<br/>category_id FK, building_id FK,<br/>managed_by_dept FK"]
+    BOOKINGS["BOOKINGS<br/><b>booking_id</b> PK<br/>resource_id FK, requested_by FK"]
+    APPROVALS["BOOKING_APPROVALS<br/><b>approval_id</b> PK<br/>booking_id FK (UNIQUE), approver_id FK"]
+    MAINT["MAINTENANCE_REQUESTS<br/><b>request_id</b> PK<br/>resource_id FK, reported_by FK,<br/>assigned_to FK"]
+    BLACK["RESOURCE_BLACKOUTS<br/><b>blackout_id</b> PK<br/>resource_id FK, maintenance_id FK,<br/>created_by FK"]
+    NOTIF["NOTIFICATIONS<br/><b>notification_id</b> PK<br/>user_id FK, booking_id FK"]
+    SNAP["UTILISATION_SNAPSHOTS<br/><b>snapshot_id</b> PK<br/>resource_id FK"]
+    AUDIT["AUDIT_LOGS<br/><b>audit_id</b> PK<br/>(table_name, record_id), no FK"]
+    ROLES --> USERS
+    DEPARTMENTS --> USERS
+    DEPARTMENTS --> RESOURCES
+    BUILDINGS --> RESOURCES
+    CATS --> RESOURCES
+    RESOURCES --> BOOKINGS
+    USERS --> BOOKINGS
+    BOOKINGS --> APPROVALS
+    USERS --> APPROVALS
+    RESOURCES --> MAINT
+    USERS --> MAINT
+    RESOURCES --> BLACK
+    MAINT --> BLACK
+    USERS --> BLACK
+    USERS --> NOTIF
+    BOOKINGS --> NOTIF
+    RESOURCES --> SNAP

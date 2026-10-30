@@ -1,0 +1,92 @@
+erDiagram
+    ROLES ||--o{ USERS : "grants role to"
+    DEPARTMENTS ||--o{ USERS : "employs / enrols"
+    DEPARTMENTS ||--o{ RESOURCES : manages
+    BUILDINGS |o--o{ RESOURCES : houses
+    RESOURCE_CATEGORIES ||--o{ RESOURCES : classifies
+    RESOURCES ||--o{ BOOKINGS : "is reserved by"
+    USERS ||--o{ BOOKINGS : requests
+    BOOKINGS ||--o| BOOKING_APPROVALS : "is decided by"
+    USERS ||--o{ BOOKING_APPROVALS : decides
+    RESOURCES ||--o{ MAINTENANCE_REQUESTS : "needs"
+    USERS ||--o{ MAINTENANCE_REQUESTS : reports
+    USERS |o--o{ MAINTENANCE_REQUESTS : "is assigned"
+    RESOURCES ||--o{ RESOURCE_BLACKOUTS : "is blocked by"
+    MAINTENANCE_REQUESTS |o--o{ RESOURCE_BLACKOUTS : causes
+    USERS ||--o{ NOTIFICATIONS : receives
+    BOOKINGS |o--o{ NOTIFICATIONS : "is about"
+    RESOURCES ||--o{ UTILISATION_SNAPSHOTS : "is measured in"
+
+    ROLES { number role_id PK
+            string role_code UK
+            char can_approve
+            char can_administer }
+    DEPARTMENTS { number dept_id PK
+            string dept_code UK
+            string dept_name UK }
+    USERS { number user_id PK
+            number role_id FK
+            number dept_id FK
+            string email UK
+            string reg_no UK
+            string password_hash
+            char is_active }
+    BUILDINGS { number building_id PK
+            string building_code UK
+            string building_name }
+    RESOURCE_CATEGORIES { number category_id PK
+            string category_code UK
+            char requires_approval
+            number max_booking_hours
+            number min_notice_hours }
+    RESOURCES { number resource_id PK
+            string resource_code UK
+            number category_id FK
+            number building_id FK
+            number managed_by_dept FK
+            number capacity
+            string status
+            number opens_at_hour
+            number closes_at_hour
+            string features_json }
+    BOOKINGS { number booking_id PK
+            number resource_id FK
+            number requested_by FK
+            timestamp start_time
+            timestamp end_time
+            string status
+            number attendees
+            string request_key UK }
+    BOOKING_APPROVALS { number approval_id PK
+            number booking_id FK
+            number approver_id FK
+            string decision
+            timestamp decided_at }
+    MAINTENANCE_REQUESTS { number request_id PK
+            number resource_id FK
+            number reported_by FK
+            number assigned_to FK
+            string priority
+            string status
+            char blocks_booking }
+    RESOURCE_BLACKOUTS { number blackout_id PK
+            number resource_id FK
+            number maintenance_id FK
+            timestamp start_time
+            timestamp end_time
+            string blackout_type }
+    AUDIT_LOGS { number audit_id PK
+            string table_name
+            number record_id
+            string action
+            string old_status
+            string new_status }
+    NOTIFICATIONS { number notification_id PK
+            number user_id FK
+            number booking_id FK
+            char is_read }
+    UTILISATION_SNAPSHOTS { number snapshot_id PK
+            number resource_id FK
+            date period_start
+            date period_end
+            number utilisation_pct }

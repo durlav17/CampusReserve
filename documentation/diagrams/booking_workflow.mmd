@@ -1,0 +1,19 @@
+stateDiagram-v2
+    [*] --> Validating : user submits request
+    Validating --> Rejected_input : invalid interval / capacity / hours / notice
+    Validating --> Locked : SELECT ... FOR UPDATE on resource row
+    Locked --> Conflict : overlapping PENDING/APPROVED booking or blackout
+    Locked --> Unavailable : resource MAINTENANCE / RETIRED
+    Locked --> PENDING : category requires approval
+    Locked --> APPROVED : no approval needed or requester is approver
+    PENDING --> APPROVED : coordinator/admin approves
+    PENDING --> REJECTED : coordinator/admin rejects (reason required)
+    PENDING --> REJECTED : expiry job (start time passed)
+    PENDING --> CANCELLED : requester or approver cancels
+    APPROVED --> CANCELLED : cancelled before end time
+    REJECTED --> [*]
+    CANCELLED --> [*]
+    APPROVED --> [*] : time slot elapses
+    Rejected_input --> [*]
+    Conflict --> [*]
+    Unavailable --> [*]

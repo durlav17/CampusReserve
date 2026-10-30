@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+        env:
+          NODE_ENV: test
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npx tsc -b
+      - run: npm run lint
+      - run: npm run build
+
+  sql-static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scripts present and terminated
+        run: |
+          for f in database/0*.sql database/1*.sql; do
+            test -s "$f" || { echo "missing $f"; exit 1; }
+          done
+          # every CREATE OR REPLACE PL/SQL unit must be followed by a "/" line
+          python3 - <<'PY'
+          import re, glob, sys
+          bad = []
+          for f in sorted(glob.glob('database/*.sql')):
+              s = open(f).read()
+              units = len(re.findall(r'^CREATE OR REPLACE (PROCEDURE|FUNCTION|PACKAGE|TRIGGER)', s, re.M))
+              slashes = len(re.findall(r'^/\s*$', s, re.M))
+              if slashes < units:
+                  bad.append(f"{f}: {units} PL/SQL units but {slashes} terminators")
+          print("\n".join(bad) or "ok")
+          sys.exit(1 if bad else 0)
+          PY

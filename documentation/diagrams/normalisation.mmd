@@ -1,0 +1,7 @@
+%%{init: {"flowchart": {"wrappingWidth": 900, "htmlLabels": true}, "themeVariables": {"fontSize": "15px"}}}%%
+flowchart TB
+    U["UNF: BOOKING_SHEET(booking_no, requester, requester_email, dept_name,<br/>resource_code, resource_name, building_name, category, requires_approval,<br/>slots {date, start, end}, approver, decision)"]
+    N1["1NF: atomic values, one row per booking slot<br/>BOOKING_1NF(booking_id, slot_start, slot_end, requester_email, requester_name,<br/>dept_name, resource_code, resource_name, building_name, category, requires_approval,<br/>approver_email, decision)"]
+    N2["2NF: single-attribute surrogate keys remove partial dependencies<br/>BOOKINGS(booking_id, resource_code, requester_email, start, end, status)<br/>USERS(email, name, dept_name) RESOURCES(code, name, building, category, requires_approval)<br/>APPROVALS(booking_id, approver_email, decision)"]
+    N3["3NF / BCNF: remove transitive dependencies<br/>RESOURCES.category -> requires_approval, max_hours  =>  RESOURCE_CATEGORIES<br/>RESOURCES.building -> building_name  =>  BUILDINGS<br/>USERS.dept -> dept_name  =>  DEPARTMENTS;  USERS.role -> can_approve  =>  ROLES"]
+    U --> N1 --> N2 --> N3

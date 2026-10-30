@@ -1,0 +1,16 @@
+sequenceDiagram
+    autonumber
+    participant A as Session A (user 1)
+    participant DB as Oracle (RESOURCES row 12)
+    participant B as Session B (user 2)
+    A->>DB: SELECT ... FROM resources WHERE id=12 FOR UPDATE WAIT 5
+    DB-->>A: row lock granted
+    B->>DB: SELECT ... FROM resources WHERE id=12 FOR UPDATE WAIT 5
+    Note over B,DB: B blocks: row already locked by A
+    A->>DB: overlap check (sees no conflict)
+    A->>DB: INSERT booking 10:00-12:00
+    A->>DB: COMMIT (lock released)
+    DB-->>B: row lock granted
+    B->>DB: overlap check (new statement: sees A's committed row)
+    DB-->>B: ORA-20005 Time slot conflicts with booking #A
+    Note over B: API rolls back B and returns HTTP 409

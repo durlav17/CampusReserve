@@ -1,0 +1,24 @@
+flowchart LR
+    subgraph Client["Browser (Netlify static hosting)"]
+        UI["React + TypeScript SPA<br/>Vite build, Tailwind, Recharts"]
+    end
+    subgraph API["Node.js API (Render web service)"]
+        MW["Express middleware<br/>helmet, CORS, rate limit,<br/>JWT auth, RBAC, zod validation"]
+        SVC["Services<br/>one transaction per request<br/>clientId = user id"]
+        MW --> SVC
+    end
+    subgraph DB["Oracle Database 19c+ / 23ai (Autonomous DB or Oracle Free)"]
+        PROC["Stand-alone procedures<br/>sp_create_booking, sp_decide_booking,<br/>sp_cancel_booking, sp_submit_maintenance,<br/>sp_update_maintenance_status"]
+        PKG["Packages<br/>PKG_CAMPUS_RESERVATIONS<br/>PKG_RESOURCE_ANALYTICS"]
+        FN["Functions<br/>duration, utilisation, availability"]
+        TRG["Triggers<br/>validation, compound overlap,<br/>audit, append-only log"]
+        TBL[("13 normalised tables<br/>+ 9 views + indexes")]
+        PROC --> TBL
+        PKG --> TBL
+        FN --> TBL
+        TRG --> TBL
+    end
+    UI -- "HTTPS JSON<br/>Bearer token" --> MW
+    SVC -- "node-oracledb Thin<br/>bind variables only" --> PROC
+    SVC --> PKG
+    SVC --> FN
